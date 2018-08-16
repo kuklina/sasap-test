@@ -28,3 +28,43 @@ catch_df <- read.csv(url("https://knb.ecoinformatics.org/knb/d1/mn/v2/object/df3
                     stringsAsFactors = FALSE)
 head(catch_df)
 ```
+Move from wide to long table
+
+```{r}
+catch_df <- catch_df %>% 
+  select(Region, Year, Chinook, Sockeye, Coho, Pink, Chum)
+# or select (-All, -notesRegCode)
+```
+
+
+```{r}
+catch_df <- catch_df %>% 
+  gather(key = "species", value = "catch", -Region, -Year) %>% 
+  rename(catch_thousands = catch)
+
+head(catch_df)
+```
+
+Reverse of gather is spread
+
+```{r}
+catch_integers <- as.integer(catch_df$catch_thousands)
+
+which(is.na(catch_integers) == T)
+```
+
+it means mistake is in the raw 401
+
+1) turn "I" into 1 in the catch_thousands column
+2) coerce catch_thousands into integer type
+3) convert catch_thousands to catch
+
+```{r}
+catch_df <- catch_df %>% 
+  mutate(catch_thousands = ifelse(catch_thousands == "I", 1, catch_thousands)) %>% 
+  mutate(catch_thousands = as.integer(catch_thousands)) %>% 
+  mutate(catch = catch_thousands * 1000)
+
+tail(catch_df)
+```
+
