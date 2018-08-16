@@ -53,7 +53,6 @@ catch_integers <- as.integer(catch_df$catch_thousands)
 which(is.na(catch_integers) == T)
 ```
 
-it means mistake is in the raw 401
 
 1) turn "I" into 1 in the catch_thousands column
 2) coerce catch_thousands into integer type
@@ -66,5 +65,66 @@ catch_df <- catch_df %>%
   mutate(catch = catch_thousands * 1000)
 
 tail(catch_df)
+```
+
+# Split-Apply-Combine
+
+```{r}
+catch_summarized <- catch_df %>%
+  group_by(Region) %>% 
+  summarize(mean_catch = mean(catch))
+
+head(catch_summarized)
+  
+```
+
+```{r}
+catch_range <- catch_df %>% 
+  group_by(Region) %>% 
+  summarize(catch_low = range(catch)[1], 
+            catch_high = range(catch)[2])
+
+head(catch_range)
+```
+
+
+```{r}
+catch_mean <- catch_df %>% 
+  group_by(Region, species) %>% 
+  #comment - can write whatever I want. Hear I calculate mean, standard deviation and number of rows
+  summarize(catch_mean = mean(catch, na.rm = T),
+            catch_stdev = sd(catch),
+            num_obs = n()) %>% 
+  #filter for Chinook
+  filter(species == "Chinook")
+
+print(catch_mean)
+```
+
+```{r}
+region_defs <- read.csv(url("https://knb.ecoinformatics.org/knb/d1/mn/v2/object/df35b.303.1", method = "libcurl"),
+                        stringsAsFactors = FALSE)
+```
+
+# Joins
+Read in region definition files
+```{r}
+region_defs <- read.csv(url("https://knb.ecoinformatics.org/knb/d1/mn/v2/object/df35b.303.1", method = "libcurl"),
+                        stringsAsFactors = FALSE)
+
+head(region_defs)
+```
+
+```{r}
+region_defs <- region_defs %>% 
+  select(code, mgmtArea)
+
+head(region_defs)
+```
+
+```{r}
+catch_joined <- left_join(catch_df, region_defs, by = c("Region" = "code"))
+
+head(catch_joined)
 ```
 
