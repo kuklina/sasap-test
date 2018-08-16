@@ -87,3 +87,7 @@ leaflet(locs) %>%
   addMarkers(~ Longitude, ~ Latitude, popup = ~ Location)
 ```
 
+```{r}
+change
+```
+
