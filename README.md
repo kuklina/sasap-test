@@ -1,6 +1,6 @@
 # sasap-test
 practicing at the Arctic Data workshop
-Vera KUklina
+Jesse Goldstein
 
 Test repository for the training
 
